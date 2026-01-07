@@ -13,8 +13,8 @@ def build_project():
     # Dossiers d'inclusion (Header files .h)
     include_dirs = [
         "-I.",                       # Le dossier courant
-        "-Ithirdparty/SDL3/include", # SDL3 headers [cite: 120]
-        "-Ithirdparty/imgui"         # ImGui headers [cite: 121]
+        "-Ithirdparty/SDL3/include", # SDL3 headers 
+        "-Ithirdparty/imgui"         # ImGui headers 
     ]
 
     # Bibliothèques à lier selon le système d'exploitation
@@ -32,13 +32,13 @@ def build_project():
     # Commande de compilation avec clang++
     cmd = [
         "g++",
-        "-std=c++17",    # Standard C++17 requis [cite: 132]
-        "-Wall",         # Affiche tous les avertissements [cite: 133]
-        "-g",            # Ajoute les infos de debug [cite: 134]
+        "-std=c++17",    # Standard C++17 requis 
+        "-Wall",         # Affiche tous les avertissements
+        "-g",            # Ajoute les infos de debug 
         *include_dirs,
         *sources,
         *libraries,
-        "-o", "mygame"   # Nom de l'exécutable final [cite: 144]
+        "-o", "mygame"   # Nom de l'exécutable final 
     ]
 
     # Exécution de la commande

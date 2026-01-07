@@ -3,53 +3,56 @@ import subprocess
 import sys
 
 def build_project():
-    # Recherche de tous les fichiers .cpp dans le dossier actuel et sous-dossiers
+    print("--- 🔨 DÉBUT DE LA COMPILATION (Mode Architecture Pro) ---")
+
+    # 1. On cherche tous les fichiers .cpp dans le dossier 'src'
     sources = []
-    for root, dirs, files in os.walk("."):
-        for file in files:
-            if file.endswith(".cpp"):
-                sources.append(os.path.join(root, file))
+    # On regarde aussi à la racine au cas où, et dans src
+    search_dirs = [".", "src"]
+    
+    for folder in search_dirs:
+        if os.path.exists(folder):
+            for file in os.listdir(folder):
+                if file.endswith(".cpp"):
+                    # On crée le chemin complet (ex: src/Game.cpp)
+                    path = os.path.join(folder, file)
+                    sources.append(path)
+                    print(f"   [+] Fichier trouvé : {path}")
 
-    # Dossiers d'inclusion (Header files .h)
+    if not sources:
+        print("❌ ERREUR : Aucun fichier .cpp trouvé ! Vérifiez vos dossiers.")
+        return
+
+    # 2. On dit au compilateur où sont les fichiers .h (include)
     include_dirs = [
-        "-I.",                       # Le dossier courant
-        "-Ithirdparty/SDL3/include", # SDL3 headers 
-        "-Ithirdparty/imgui"         # ImGui headers 
+        "-I.",                       
+        "-Iinclude",                 # Regarde dans le dossier include
+        "-Ithirdparty/SDL3/include", 
+        "-Ithirdparty/imgui"         
     ]
 
-    # Bibliothèques à lier selon le système d'exploitation
-    libraries = []
-    if sys.platform == "win32":
-        # Windows
-        libraries = ["-lSDL3", "-limm32"] 
-    elif sys.platform == "darwin":
-        # MacOS
-        libraries = ["-lSDL3", "-framework Cocoa"]
-    else:
-        # Linux / Autres
-        libraries = ["-lSDL3", "-ldl", "-lpthread"]
+    # 3. Les bibliothèques (Windows)
+    libraries = ["-lSDL3", "-limm32"]
 
-    # Commande de compilation avec clang++
+    # 4. La commande finale
     cmd = [
-        "g++",
-        "-std=c++17",    # Standard C++17 requis 
-        "-Wall",         # Affiche tous les avertissements
-        "-g",            # Ajoute les infos de debug 
-        *include_dirs,
-        *sources,
-        *libraries,
-        "-o", "mygame"   # Nom de l'exécutable final 
+        "g++",           
+        "-std=c++17",    
+        "-Wall",         
+        "-g",            
+        *include_dirs,   
+        *sources,        
+        *libraries,      
+        "-o", "mygame"   
     ]
 
-    # Exécution de la commande
-    print("Compilation en cours...")
+    # 5. On lance !
     try:
         subprocess.run(cmd, check=True)
-        print("Succès ! Exécutable 'mygame' créé.")
+        print("\n✅ SUCCÈS ! Votre jeu est prêt.")
+        print("👉 Tapez 'mygame.exe' pour jouer.")
     except subprocess.CalledProcessError:
-        print("Erreur lors de la compilation.")
-    except FileNotFoundError:
-        print("Erreur : Le compilateur 'clang++' n'a pas été trouvé. Assurez-vous qu'il est installé.")
+        print("\n❌ ÉCHEC. Regardez les erreurs rouges ci-dessus.")
 
 if __name__ == "__main__":
     build_project()

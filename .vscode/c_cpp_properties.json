@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "C:\\Users\\Game_Changer one\\OneDrive\\Desktop\\MonProjet\\thirdparty\\imgui",
-                "C:\\Users\\Game_Changer one\\OneDrive\\Desktop\\MonProjet\\thirdparty\\SDL3\\include\\SDL3"
+                "C:\\Users\\Game_Changer one\\OneDrive\\Desktop\\MonProjet\\thirdparty\\SDL3\\include\\SDL3",
+                "${workspaceFolder}/include"
             ],
             "defines": [
                 "_DEBUG",
@@ -15,7 +16,10 @@
             "compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "${default}"
+            "intelliSenseMode": "${default}",
+            "compilerArgs": [
+                "C:\\Users\\Game_Changer one\\OneDrive\\Desktop\\MonProjet\\include"
+            ]
         }
     ],
     "version": 4

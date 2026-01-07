@@ -34,7 +34,7 @@ void Game::ProcessInput() {
 }
 
 void Game::Update() {
-    // La physique viendra ici (Semaine 2)
+    // La physique viendra ici 
 }
 
 void Game::GenerateOutput() {

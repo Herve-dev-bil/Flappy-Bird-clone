@@ -12,6 +12,11 @@ Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nul
     mRenderer = SDL_CreateRenderer(mWindow, NULL);
 
     mBird = new Bird();
+
+    if (!mBird->Initialize(mRenderer)) {
+        SDL_Log("Attention : L'oiseau n'a pas pu charger son image !");
+    }
+
 }
 
 Game::~Game()

@@ -47,4 +47,4 @@ void Renderer::Shutdown() {
     if (mSDLRenderer) SDL_DestroyRenderer(mSDLRenderer);
     if (mWindow) SDL_DestroyWindow(mWindow);
     SDL_Quit();
-                
+}

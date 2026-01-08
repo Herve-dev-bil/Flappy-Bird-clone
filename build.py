@@ -3,56 +3,53 @@ import subprocess
 import sys
 
 def build_project():
-    print("--- 🔨 DÉBUT DE LA COMPILATION (Mode Architecture Pro) ---")
+    print("--- 🔨 DÉBUT DE LA COMPILATION (Mode Recherche Totale) ---")
 
-    # 1. On cherche tous les fichiers .cpp dans le dossier 'src'
+    # 1. Recherche de TOUS les fichiers .cpp (Racine + src)
     sources = []
-    # On regarde aussi à la racine au cas où, et dans src
-    search_dirs = [".", "src"]
+    # On regarde dans le dossier courant (.) et dans src
+    directories_to_check = [".", "src"]
     
-    for folder in search_dirs:
-        if os.path.exists(folder):
-            for file in os.listdir(folder):
+    for directory in directories_to_check:
+        if os.path.exists(directory):
+            for file in os.listdir(directory):
                 if file.endswith(".cpp"):
-                    # On crée le chemin complet (ex: src/Game.cpp)
-                    path = os.path.join(folder, file)
+                    path = os.path.join(directory, file)
                     sources.append(path)
                     print(f"   [+] Fichier trouvé : {path}")
 
-    if not sources:
-        print("❌ ERREUR : Aucun fichier .cpp trouvé ! Vérifiez vos dossiers.")
+    # Vérification
+    if len(sources) == 0:
+        print("❌ ERREUR CRITIQUE : Aucun fichier .cpp trouvé !")
         return
 
-    # 2. On dit au compilateur où sont les fichiers .h (include)
+    # 2. Configuration des dossiers Include (.h)
     include_dirs = [
         "-I.",                       
-        "-Iinclude",                 # Regarde dans le dossier include
-        "-Ithirdparty/SDL3/include", 
-        "-Ithirdparty/imgui"         
+        "-Iinclude",                 
+        "-Isrc",                     
+        "-Ithirdparty/SDL3/include"  
     ]
 
-    # 3. Les bibliothèques (Windows)
-    libraries = ["-lSDL3", "-limm32"]
+    # 3. Bibliothèques
+    libraries = ["-lSDL3"]
 
-    # 4. La commande finale
+    # 4. Commande de compilation
     cmd = [
-        "g++",           
-        "-std=c++17",    
-        "-Wall",         
-        "-g",            
+        "g++", "-std=c++17", "-g",
         *include_dirs,   
         *sources,        
         *libraries,      
         "-o", "mygame"   
     ]
 
-    # 5. On lance !
+    # 5. Exécution
     try:
         subprocess.run(cmd, check=True)
         print("\n✅ SUCCÈS ! Votre jeu est prêt.")
         print("👉 Tapez 'mygame.exe' pour jouer.")
     except subprocess.CalledProcessError:
-        print("\n❌ ÉCHEC. Regardez les erreurs rouges ci-dessus.")
+        print("\n❌ ÉCHEC DE LA COMPILATION.")
 
 if __name__ == "__main__":
     build_project()

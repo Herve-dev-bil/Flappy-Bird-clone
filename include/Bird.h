@@ -3,21 +3,18 @@
 
 #include <SDL3/SDL.h>
 
-// On dit à l'ordinateur que la classe "Renderer" existe (Forward Declaration)
-class Renderer; 
-
 class Bird {
 public:
+    // La Naissance
     Bird();
-    void Update(float deltaTime);
 
-    // CHANGEMENT ICI : On prend votre Renderer, pas celui de SDL
-    void Draw(Renderer* renderer);
+    //  L'Affichage
+    void Draw(SDL_Renderer* renderer);
 
 private:
+    //  Le Corps (Position et Taille)
+   
     SDL_FRect mRect;
-    float mVelocity;
-    const float GRAVITY = 1000.0f;
 };
 
 #endif

@@ -1,0 +1,73 @@
+#include "Game.h"
+
+
+// --- LE CONSTRUCTEUR (Naissance) ---
+Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nullptr){
+    // 1. On démarre le système vidéo de SDL
+    SDL_Init(SDL_INIT_VIDEO);
+
+    mWindow = SDL_CreateWindow("Flappy Bird", 800, 600, 0);
+
+    // NULL = Laisse SDL choisir le meilleur pilote (DirectX etc.)
+    mRenderer = SDL_CreateRenderer(mWindow, NULL);
+
+    mBird = new Bird();
+}
+
+Game::~Game()
+{
+
+    delete mBird;
+    // On détruit dans l'ordre inverse de la création
+    SDL_DestroyRenderer(mRenderer);
+    SDL_DestroyWindow(mWindow);
+    SDL_Quit(); // On éteint SDL
+}
+void Game::Run()
+{
+
+    Uint64 lastTime = SDL_GetTicks();
+
+    while (mIsRunning)
+    {
+
+        Uint64 currentTime = SDL_GetTicks();
+        // difference du temps
+        float deltaTime = (currentTime - lastTime) / 1000.0f;
+
+        // mise a jour de l'heure
+        lastTime = currentTime;
+
+        ProcessInput();
+        Update(deltaTime);
+        GenerateOutput();
+    }
+}
+
+void Game::ProcessInput()
+{
+    SDL_Event event;
+
+    while (SDL_PollEvent(&event))
+    {
+
+        if (event.type == SDL_EVENT_QUIT)
+        {
+            mIsRunning = false;
+        }
+    }
+}
+
+void Game::Update(float deltaTime){
+
+
+}
+
+void Game::GenerateOutput(){
+SDL_SetRenderDrawColor(mRenderer, 135, 206, 235, 255);
+
+SDL_RenderClear(mRenderer);
+mBird->Draw(mRenderer);
+
+SDL_RenderPresent(mRenderer);
+}

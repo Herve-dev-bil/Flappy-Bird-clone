@@ -23,6 +23,11 @@ Game::~Game()
     SDL_DestroyWindow(mWindow);
     SDL_Quit(); // On éteint SDL
 }
+
+void Game::Update(float deltaTime) {
+    // l'oiseau Calcule sa nouvelle position selon le temps écoulé"
+    mBird->Update(deltaTime);
+}
 void Game::Run()
 {
 
@@ -54,14 +59,18 @@ void Game::ProcessInput()
         if (event.type == SDL_EVENT_QUIT)
         {
             mIsRunning = false;
+
+        } else if(event.type == SDL_EVENT_KEY_DOWN){
+            if(event.key.key == SDLK_SPACE){
+                if(!event.key.repeat){
+                    mBird->Jump();
+                }
+            }
+
         }
     }
 }
 
-void Game::Update(float deltaTime){
-
-
-}
 
 void Game::GenerateOutput(){
 SDL_SetRenderDrawColor(mRenderer, 135, 206, 235, 255);

@@ -9,6 +9,19 @@ Bird::Bird() {
     //largeur, hauteur
     mRect.w = 30.0f;//petit carre 
     mRect.h = 30.0f;
+
+    mVelocity =0.0f;//depart->vitesse=0
+}
+
+void Bird::Jump(){
+    mVelocity = -500.0f;//inverse donc negatiif
+}
+
+void Bird::Update(float deltaTime)
+{
+mVelocity += GRAVITY * deltaTime;
+
+mRect.y += mVelocity * deltaTime;
 }
 //affichage
 

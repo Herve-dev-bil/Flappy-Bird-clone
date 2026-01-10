@@ -8,7 +8,7 @@ def build_project():
     # 1. Recherche de TOUS les fichiers .cpp (Racine + src)
     sources = []
     # On regarde dans le dossier courant (.) et dans src
-    directories_to_check = [".", "src"]
+    directories_to_check = [".", "src", "libs/imgui"]
     
     for directory in directories_to_check:
         if os.path.exists(directory):
@@ -28,7 +28,8 @@ def build_project():
         "-I.",                       
         "-Iinclude",                 
         "-Isrc",                     
-        "-Ithirdparty/SDL3/include"  
+        "-Ithirdparty/SDL3/include" ,
+        "-Ilibs/imgui"
     ]
 
     # 3. Bibliothèques
@@ -40,14 +41,14 @@ def build_project():
         *include_dirs,   
         *sources,        
         *libraries,      
-        "-o", "mygame"   
+        "-o", "Flappy_Bird_by_Game_Changer "   
     ]
 
     # 5. Exécution
     try:
         subprocess.run(cmd, check=True)
         print("\n✅ SUCCÈS ! Votre jeu est prêt.")
-        print("👉 Tapez 'mygame.exe' pour jouer.")
+        print("👉 Tapez 'Flappy_Bird_by_Game_Changer' pour jouer.")
     except subprocess.CalledProcessError:
         print("\n❌ ÉCHEC DE LA COMPILATION.")
 

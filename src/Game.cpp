@@ -36,6 +36,7 @@ void Game::Update(float deltaTime)
 {
     // l'oiseau Calcule sa nouvelle position selon le temps écoulé"
     mBird->Update(deltaTime);
+    
     mPipeSpawnTimer += deltaTime;
     if (mPipeSpawnTimer >= 1.5f)
     { // Tous les 1.5 secondes
@@ -44,11 +45,17 @@ void Game::Update(float deltaTime)
         mPipeSpawnTimer = 0.0f; // On remet le chrono à 0
     }
 
-    // 2. MISE À JOUR DES TUYAUX
+    // MISE À JOUR DES TUYAUX
     // On utilise une boucle spéciale pour parcourir la liste
     for (int i = 0; i < mPipes.size(); i++)
     {
         mPipes[i]->Update(deltaTime);
+
+        if (mPipes[i]->CheckCollision(mBird->GetRect())) 
+    {
+        SDL_Log("BOOM ! Collision détectée !");
+        mIsRunning = false; // On arrête le jeu pour l'instant
+    }
 
         // Si le tuyau est sorti de l'écran
         if (mPipes[i]->IsOffScreen())
@@ -114,7 +121,7 @@ void Game::GenerateOutput()
         pipe->Draw(mRenderer);
     }
 
-    //  l'oiseau
+    //  dessine l'oiseau
     mBird->Draw(mRenderer);
 
     // 4. On affiche le tout

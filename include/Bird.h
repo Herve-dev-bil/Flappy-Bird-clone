@@ -20,6 +20,9 @@ public:
 
     bool Initialize(SDL_Renderer *renderer);
 
+//accesseur au mRect(getter)
+const SDL_FRect& GetRect() const { return mRect; }
+
 private:
     // l'image de flappy
     SDL_Texture *mTexture;

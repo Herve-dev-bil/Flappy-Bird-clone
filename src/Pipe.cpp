@@ -40,3 +40,30 @@ bool Pipe::IsOffScreen() {
     // Si le tuyau est complètement à gauche de l'écran (x < -largeur)
     return (mX + width < 0);
 }
+
+// Pipe.cpp (tout en bas du fichier)
+bool Pipe::CheckCollision(const SDL_FRect& birdRect) {
+    // 1. Reconstruire le rectangle du HAUT (identique à Draw)
+    SDL_FRect topPipe;
+    topPipe.x = mX;
+    topPipe.y = 0;
+    topPipe.w = width;
+    topPipe.h = mGapY - (gapSize / 2);
+
+    // 2. Reconstruire le rectangle du BAS
+    SDL_FRect bottomPipe;
+    bottomPipe.x = mX;
+    bottomPipe.y = mGapY + (gapSize / 2);
+    bottomPipe.w = width;
+    bottomPipe.h = 600 - bottomPipe.y; // Assurez-vous que 600 est bien la hauteur de votre fenêtre
+
+    // 3. Vérifier si l'oiseau touche l'un des deux
+    if (SDL_HasRectIntersectionFloat(&birdRect, &topPipe)) {
+        return true; // Touche le haut
+    }
+    if (SDL_HasRectIntersectionFloat(&birdRect, &bottomPipe)) {
+        return true; // Touche le bas
+    }
+    
+    return false; // Pas de collision
+}

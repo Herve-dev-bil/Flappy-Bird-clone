@@ -20,8 +20,10 @@ public:
 
     bool Initialize(SDL_Renderer *renderer);
 
-//accesseur au mRect(getter)
-const SDL_FRect& GetRect() const { return mRect; }
+//accesseur au mHitbox(getter)
+SDL_FRect * GetRect() { return &mRect; }
+
+SDL_FRect GetHitbox();
 
 private:
     // l'image de flappy
@@ -29,6 +31,7 @@ private:
 
     //  Le Corps (Position et Taille)
     SDL_FRect mRect;
+
 
     // variables physique
     float mVelocity;               // Vitesse actuelle (0 = arrêt, positif = descend)

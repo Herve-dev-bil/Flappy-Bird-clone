@@ -23,14 +23,14 @@ void Pipe::Draw(SDL_Renderer* renderer) {
     topPipe.x = mX;
     topPipe.y = 0;
     topPipe.w = width;
-    topPipe.h = mGapY - (gapSize / 2); // S'arrête au début du trou
+    topPipe.h = mGapY - (GAP_SIZE / 2); // S'arrête au début du trou
     SDL_RenderFillRect(renderer, &topPipe);
 
     // 2. Tuyau du BAS
     // Il part de la fin du trou et va jusqu'à 600 (bas de l'écran)
     SDL_FRect bottomPipe;
     bottomPipe.x = mX;
-    bottomPipe.y = mGapY + (gapSize / 2); // Commence après le trou
+    bottomPipe.y = mGapY + (GAP_SIZE/ 2); // Commence après le trou
     bottomPipe.w = width;
     bottomPipe.h = 600 - bottomPipe.y;    // Va jusqu'en bas
     SDL_RenderFillRect(renderer, &bottomPipe);
@@ -41,29 +41,12 @@ bool Pipe::IsOffScreen() {
     return (mX + width < 0);
 }
 
-// Pipe.cpp (tout en bas du fichier)
-bool Pipe::CheckCollision(const SDL_FRect& birdRect) {
-    // 1. Reconstruire le rectangle du HAUT (identique à Draw)
-    SDL_FRect topPipe;
-    topPipe.x = mX;
-    topPipe.y = 0;
-    topPipe.w = width;
-    topPipe.h = mGapY - (gapSize / 2);
-
-    // 2. Reconstruire le rectangle du BAS
-    SDL_FRect bottomPipe;
-    bottomPipe.x = mX;
-    bottomPipe.y = mGapY + (gapSize / 2);
-    bottomPipe.w = width;
-    bottomPipe.h = 600 - bottomPipe.y; // Assurez-vous que 600 est bien la hauteur de votre fenêtre
-
-    // 3. Vérifier si l'oiseau touche l'un des deux
-    if (SDL_HasRectIntersectionFloat(&birdRect, &topPipe)) {
-        return true; // Touche le haut
-    }
-    if (SDL_HasRectIntersectionFloat(&birdRect, &bottomPipe)) {
-        return true; // Touche le bas
-    }
-    
-    return false; // Pas de collision
+//FONCTIONS DE COLLISION (Hitboxes)
+SDL_FRect Pipe::GetTopRect() {
+    // Le tuyau du haut va de 0 jusqu'au début du trou
+    return {mX, 0, width, mGapY - (GAP_SIZE / 2)};
+}
+SDL_FRect Pipe::GetBottomRect() {
+    // Le tuyau du bas commence après le trou et va jusqu'en bas (600)
+    return {mX, mGapY + (GAP_SIZE / 2), width, 600.0f - (mGapY + (GAP_SIZE / 2))};
 }

@@ -9,8 +9,8 @@ Bird::Bird()
     mRect.x = 100.0f;
     mRect.y = 300.0f;
 
-    mRect.w = 136.0f; // Largeur de l'image
-    mRect.h = 96.0f; // Hauteur de l'image
+    mRect.w = 68.0f; // Largeur de l'image
+    mRect.h = 48.0f; // Hauteur de l'image
 
     mVelocity = 0.0f; // depart->vitesse=0
 }
@@ -20,7 +20,7 @@ bool Bird::Initialize(SDL_Renderer *renderer)
     // Charger l'image avec STB (Supporte PNG, JPG, etc.)
     int width, height, channels;
     // On force 4 canaux (Rouge, Vert, Bleu, Alpha/Transparence)
-    unsigned char *data = stbi_load("assets/images/flappyOld-removebg-preview.png", &width, &height, &channels, 4);
+    unsigned char *data = stbi_load("assets/images/flappyOld-removebg-preview (1).png", &width, &height, &channels, 4);
 
     if (!data)
     {
@@ -63,7 +63,9 @@ void Bird::Update(float deltaTime)
     mVelocity += GRAVITY * deltaTime;
 
     mRect.y += mVelocity * deltaTime;
+
 }
+
 // affichage
 
 void Bird::Draw(SDL_Renderer *renderer)
@@ -72,6 +74,14 @@ void Bird::Draw(SDL_Renderer *renderer)
     {
         // dessine la texture
         SDL_RenderTexture(renderer, mTexture, NULL, &mRect);
+        SDL_FRect debugBox= GetHitbox();
+
+        //Dessiner la hitbox en rouge, aide a visualiser le hitbox
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderRect(renderer, &debugBox);
+
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderRect(renderer, &mRect);
     }
     else
     {
@@ -80,4 +90,19 @@ void Bird::Draw(SDL_Renderer *renderer)
 
         SDL_RenderFillRect(renderer, &mRect);
     }
+}
+SDL_FRect Bird::GetHitbox()
+{
+    float paddingX = 8.0f; 
+    float paddingY = 6.0f; 
+
+    SDL_FRect hitbox;
+    
+    // On rétrécit le rectangle
+    hitbox.x = mRect.x + paddingX;
+    hitbox.y = mRect.y + paddingY;
+    hitbox.w = mRect.w - (paddingX * 2);
+    hitbox.h = mRect.h - (paddingY * 2);
+    
+    return hitbox;
 }

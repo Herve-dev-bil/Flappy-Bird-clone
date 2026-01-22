@@ -19,7 +19,9 @@ public:
     float GetX() { return mX; }
     float GetWidth() { return width; }
 
-    bool CheckCollision(const SDL_FRect &birdRect);
+
+     SDL_FRect GetTopRect();//tuyau d'en haut
+    SDL_FRect GetBottomRect();//tuyau d'en bas
 
 private:
     float mX;    //  horizontale
@@ -27,8 +29,8 @@ private:
 
     // Constantes (Règles du jeu)
     const float width = 60.0f;    // Largeur du tuyau
-    const float speed = 300.0f;   // Vitesse
-    const float gapSize = 150.0f; // Taille du trou pour passer
+    const float speed = 300.0f;   // Vitesse de glissement(meme que le sol)
+    const float GAP_SIZE = 150.0f; // Taille du trou pour passer
 };
 
 #endif

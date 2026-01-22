@@ -3,13 +3,12 @@
 // --- LE CONSTRUCTEUR (Naissance) ---
 Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nullptr)
 {
-   
+
     // 1. On démarre le système vidéo de SDL
     SDL_Init(SDL_INIT_VIDEO);
 
     mWindow = SDL_CreateWindow("Flappy Bird", 800, 600, 0);
 
-    // NULL = Laisse SDL choisir le meilleur pilote (DirectX etc.)
     mRenderer = SDL_CreateRenderer(mWindow, NULL);
 
     mBird = new Bird();
@@ -19,9 +18,8 @@ Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nul
         SDL_Log("Attention : L'oiseau n'a pas pu charger son image !");
     }
 
-     //initialise le chronometre a 0
+    // initialise le chronometre a 0
     mPipeSpawnTimer = 0.0f;
-
 }
 
 Game::~Game()
@@ -109,14 +107,16 @@ void Game::ProcessInput()
 void Game::GenerateOutput()
 {
     SDL_SetRenderDrawColor(mRenderer, 135, 206, 235, 255);
-
-    // DESSINER LES TUYAUX
+    SDL_RenderClear(mRenderer);
+    // dessine les tuyaux
     for (auto pipe : mPipes)
     {
         pipe->Draw(mRenderer);
     }
-    SDL_RenderClear(mRenderer);
+
+    //  l'oiseau
     mBird->Draw(mRenderer);
 
+    // 4. On affiche le tout
     SDL_RenderPresent(mRenderer);
 }

@@ -33,7 +33,7 @@ def build_project():
     ]
 
     # 3. Bibliothèques
-    libraries = ["-lSDL3"]
+    libraries = ["-Llib","-lSDL3","-lSDL3_image"]
 
     # 4. Commande de compilation
     cmd = [

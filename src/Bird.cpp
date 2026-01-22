@@ -1,5 +1,4 @@
 #include "Bird.h"
-#include "Renderer.h" // <--- Important pour connaître DrawRect
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -18,7 +17,7 @@ Bird::Bird()
 
 bool Bird::Initialize(SDL_Renderer *renderer)
 {
-    // 1. Charger l'image avec STB (Supporte PNG, JPG, etc.)
+    // Charger l'image avec STB (Supporte PNG, JPG, etc.)
     int width, height, channels;
     // On force 4 canaux (Rouge, Vert, Bleu, Alpha/Transparence)
     unsigned char *data = stbi_load("assets/images/flappyOld-removebg-preview.png", &width, &height, &channels, 4);

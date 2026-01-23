@@ -1,5 +1,19 @@
 #include "Game.h"
+#include "SDL_image.h"
 
+//=======================================================================================
+
+SDL_Texture *Game::LoadTexture(const char *fileName)
+{
+    SDL_Texture *tex = IMG_LoadTexture(mRenderer, fileName);
+    if (!tex)
+    {
+        SDL_Log("Erreur chargement texture %s : %s", fileName, SDL_GetError());
+    }
+    return tex;
+}
+
+//=======================================================================================
 // --- LE CONSTRUCTEUR (Naissance) ---
 Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nullptr)
 {
@@ -18,14 +32,38 @@ Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nul
         SDL_Log("Attention : L'oiseau n'a pas pu charger son image !");
     }
 
+    // 4. On charge le décor (Ciel et Sol)
+    mTexBackground = LoadTexture("assets/images/world1-removebg-preview (1).png");
+    mTexGround = LoadTexture("assets/images/flappy_ground.png");
+    mTexPipe = LoadTexture("assets/images/green_pipe-removebg-preview (1).png");
+    mGroundX = 0.0f;
+
     // initialise le chronometre a 0
     mPipeSpawnTimer = 0.0f;
 }
+
+//=======================================================================================
 
 Game::~Game()
 {
 
     delete mBird;
+
+    // 2. Nettoyage des tuyaux restants
+    for (auto pipe : mPipes)
+    {
+        delete pipe;
+    }
+    mPipes.clear();
+
+    // 3. Nettoyage des textures
+    if (mTexBackground)
+        SDL_DestroyTexture(mTexBackground);
+    if (mTexGround)
+        SDL_DestroyTexture(mTexGround);
+    if (mTexPipe)
+        SDL_DestroyTexture(mTexPipe);
+
     // On détruit dans l'ordre inverse de la création
     SDL_DestroyRenderer(mRenderer);
     SDL_DestroyWindow(mWindow);
@@ -36,6 +74,20 @@ void Game::Update(float deltaTime)
 {
     // l'oiseau Calcule sa nouvelle position selon le temps écoulé"
     mBird->Update(deltaTime);
+
+    // 2. Collision Oiseau vs Sol
+    SDL_FRect birdHitbox = mBird->GetHitbox();
+    //regarde si le bas du hitbox touche le sol
+    if (birdHitbox.y + birdHitbox.h >= 500.0f)
+    {
+        SDL_Log("MORT : Touché le sol !");
+        mIsRunning = false;
+    }
+
+    // 3. Défilement du Sol
+    mGroundX -= 200.0f * deltaTime;
+    if (mGroundX <= -800.0f)
+        mGroundX = 0.0f;
 
     mPipeSpawnTimer += deltaTime;
     if (mPipeSpawnTimer >= 1.5f)
@@ -70,10 +122,12 @@ void Game::Update(float deltaTime)
             SDL_HasRectIntersectionFloat(&birdHitbox, &rBottom))
         {
             SDL_Log("MORT : Collision Tuyau !");
-            mIsRunning=false;
+            mIsRunning = false;
         }
     }
 }
+
+//=======================================================================================
 void Game::Run()
 {
 
@@ -95,6 +149,7 @@ void Game::Run()
     }
 }
 
+//=======================================================================================
 void Game::ProcessInput()
 {
     SDL_Event event;
@@ -119,14 +174,33 @@ void Game::ProcessInput()
     }
 }
 
+//=======================================================================================
+
 void Game::GenerateOutput()
 {
     SDL_SetRenderDrawColor(mRenderer, 135, 206, 235, 255);
     SDL_RenderClear(mRenderer);
-    // dessine les tuyaux
+
+    // Dessiner le fond (Image)
+    if (mTexBackground)
+    {
+        SDL_RenderTexture(mRenderer, mTexBackground, NULL, NULL);
+    }
+
+    // Dessiner les Tuyaux
     for (auto pipe : mPipes)
     {
-        pipe->Draw(mRenderer);
+        pipe->Draw(mRenderer, mTexPipe);
+    }
+
+    // Dessiner le Sol (qui défile)
+    if (mTexGround)
+    {
+        SDL_FRect r1 = {mGroundX, 500, 800, 100};
+        SDL_RenderTexture(mRenderer, mTexGround, NULL, &r1);
+
+        SDL_FRect r2 = {mGroundX + 800, 500, 800, 100};
+        SDL_RenderTexture(mRenderer, mTexGround, NULL, &r2);
     }
 
     //  dessine l'oiseau

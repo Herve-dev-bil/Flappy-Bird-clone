@@ -1,6 +1,8 @@
 #include "Pipe.h"
 #include <cstdlib> // Pour rand() (nombres aléatoires)
 
+//=======================================================================================
+
 Pipe::Pipe(float startX) {
     mX = startX;
     
@@ -9,32 +11,52 @@ Pipe::Pipe(float startX) {
     mGapY = 150.0f + (rand() % 300); 
 }
 
+//=======================================================================================
+
 void Pipe::Update(float deltaTime) {
     // Le tuyau avance vers la gauche
     mX -= speed * deltaTime;
 }
 
-void Pipe::Draw(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // VERT
+//=======================================================================================
 
-    // 1. Tuyau du HAUT
-    // Il part de 0 (haut) et descend jusqu'au début du trou
-    SDL_FRect topPipe;
-    topPipe.x = mX;
-    topPipe.y = 0;
-    topPipe.w = width;
-    topPipe.h = mGapY - (GAP_SIZE / 2); // S'arrête au début du trou
-    SDL_RenderFillRect(renderer, &topPipe);
+void Pipe::Draw(SDL_Renderer* renderer, SDL_Texture* texture) {
+     // 1. Tuyau du HAUT (Retourné verticalement)
+    SDL_FRect topRect = GetTopRect();
+    
+    if (texture) {
+        // On utilise RenderTextureRotated pour faire le FLIP
+        SDL_RenderTextureRotated(
+            renderer, 
+            texture, 
+            NULL,       // Toute l'image source
+            &topRect,   // Destination
+            0.0,        // Pas de rotation d'angle
+            NULL,       // Centre de rotation par défaut
+            SDL_FLIP_VERTICAL //Tête en bas(flip)
 
-    // 2. Tuyau du BAS
-    // Il part de la fin du trou et va jusqu'à 600 (bas de l'écran)
-    SDL_FRect bottomPipe;
-    bottomPipe.x = mX;
-    bottomPipe.y = mGapY + (GAP_SIZE/ 2); // Commence après le trou
-    bottomPipe.w = width;
-    bottomPipe.h = 600 - bottomPipe.y;    // Va jusqu'en bas
-    SDL_RenderFillRect(renderer, &bottomPipe);
+            
+        );
+
+         
+    } else {
+        // Mode secours (Vert)
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderFillRect(renderer, &topRect);
+    }
+
+    // 2. Tuyau du BAS (Normal)
+    SDL_FRect bottomRect = GetBottomRect();
+    
+    if (texture) {
+        SDL_RenderTexture(renderer, texture, NULL, &bottomRect);
+    } else {
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderFillRect(renderer, &bottomRect);
+    }
 }
+
+//=======================================================================================
 
 bool Pipe::IsOffScreen() {
     // Si le tuyau est complètement à gauche de l'écran (x < -largeur)
@@ -50,3 +72,4 @@ SDL_FRect Pipe::GetBottomRect() {
     // Le tuyau du bas commence après le trou et va jusqu'en bas (600)
     return {mX, mGapY + (GAP_SIZE / 2), width, 600.0f - (mGapY + (GAP_SIZE / 2))};
 }
+//=======================================================================================

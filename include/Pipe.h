@@ -10,7 +10,7 @@ public:
     Pipe(float startX);
 
     void Update(float deltaTime);
-    void Draw(SDL_Renderer *renderer);
+    void Draw(SDL_Renderer *renderer, SDL_Texture *texture);
 
     // Pour savoir si le tuyau est sorti de l'écran
     bool IsOffScreen();
@@ -19,17 +19,16 @@ public:
     float GetX() { return mX; }
     float GetWidth() { return width; }
 
-
-     SDL_FRect GetTopRect();//tuyau d'en haut
-    SDL_FRect GetBottomRect();//tuyau d'en bas
+    SDL_FRect GetTopRect();    // tuyau d'en haut
+    SDL_FRect GetBottomRect(); // tuyau d'en bas
 
 private:
     float mX;    //  horizontale
     float mGapY; // Hauteur
 
     // Constantes (Règles du jeu)
-    const float width = 60.0f;    // Largeur du tuyau
-    const float speed = 300.0f;   // Vitesse de glissement(meme que le sol)
+    const float width = 60.0f;     // Largeur du tuyau
+    const float speed = 300.0f;    // Vitesse de glissement(meme que le sol)
     const float GAP_SIZE = 150.0f; // Taille du trou pour passer
 };
 

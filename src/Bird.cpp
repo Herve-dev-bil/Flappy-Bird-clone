@@ -1,7 +1,10 @@
 #include "Bird.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "SDL_image.h" // Important pour IMG_LoadTexture
+
+
+//=======================================================================================
+
 Bird::Bird()
 {
 
@@ -15,48 +18,31 @@ Bird::Bird()
     mVelocity = 0.0f; // depart->vitesse=0
 }
 
+
+//=======================================================================================
+
 bool Bird::Initialize(SDL_Renderer *renderer)
-{
-    // Charger l'image avec STB (Supporte PNG, JPG, etc.)
-    int width, height, channels;
-    // On force 4 canaux (Rouge, Vert, Bleu, Alpha/Transparence)
-    unsigned char *data = stbi_load("assets/images/flappyOld-removebg-preview (1).png", &width, &height, &channels, 4);
-
-    if (!data)
+{// On charge l'image originale (l'oiseau unique)
+    mTexture = IMG_LoadTexture(renderer, "assets/images/flappyOld-removebg-preview (1).png");
+    
+    if (!mTexture)
     {
-        SDL_Log("Erreur chargement image (STB) : %s", stbi_failure_reason());
+        SDL_Log("Erreur chargement Bird : %s", SDL_GetError());
         return false;
     }
 
-    // SDL3 a besoin de savoir : Largeur, Hauteur, Format, Données, et Pitch (largeur * 4 octets)
-    SDL_Surface *surface = SDL_CreateSurfaceFrom(
-        width,
-        height,
-        SDL_PIXELFORMAT_RGBA32,
-        data,
-        width * 4);
-
-    if (!surface)
-    {
-        SDL_Log("Erreur création surface : %s", SDL_GetError());
-        stbi_image_free(data); // Important : Nettoyer la mémoire de STB
-        return false;
-    }
-
-    // 3. Créer la Texture GPU
-    mTexture = SDL_CreateTextureFromSurface(renderer, surface);
-
-    // 4. Nettoyage
-    SDL_DestroySurface(surface);
-    stbi_image_free(data); // On libère la RAM utilisée par STB
-
-    return mTexture != nullptr;
+    return true;
 }
+
+//=======================================================================================
 
 void Bird::Jump()
 {
     mVelocity = -500.0f; // inverse donc negatiif
 }
+
+//=======================================================================================
+
 
 void Bird::Update(float deltaTime)
 {
@@ -65,6 +51,9 @@ void Bird::Update(float deltaTime)
     mRect.y += mVelocity * deltaTime;
 
 }
+
+//=======================================================================================
+
 
 // affichage
 
@@ -91,6 +80,9 @@ void Bird::Draw(SDL_Renderer *renderer)
         SDL_RenderFillRect(renderer, &mRect);
     }
 }
+
+//=======================================================================================
+
 SDL_FRect Bird::GetHitbox()
 {
     float paddingX = 8.0f; 
@@ -106,3 +98,4 @@ SDL_FRect Bird::GetHitbox()
     
     return hitbox;
 }
+//=======================================================================================

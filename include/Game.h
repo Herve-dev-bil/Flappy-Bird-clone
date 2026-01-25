@@ -13,12 +13,16 @@ public:
   ~Game();
   void Run();
 
-  int mScore; // LE SCORE
+  // Ajoutez un "getter" pour que l'UI puisse afficher le record
+  int GetHighScore() const { return mHighScore; }
 
 private:
   void ProcessInput();
   void Update(float deltaTime);
   void GenerateOutput();
+
+  void LoadHighScore(); // Lire le fichier au démarrage
+  void SaveHighScore(); // Écrire dans le fichier quand on gagne
 
   SDL_Window *mWindow;
   SDL_Renderer *mRenderer;
@@ -26,7 +30,9 @@ private:
   bool game_paused;
 
   Bird *mBird;
- 
+
+  int mScore;     // LE SCORE
+  int mHighScore; // Le Record (sauvegardé)
 
   SDL_Texture *mTexBackground; // L'image du ciel
   SDL_Texture *mTexGround;     // L'image du sol

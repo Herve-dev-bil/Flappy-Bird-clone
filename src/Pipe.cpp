@@ -17,7 +17,7 @@ Pipe::Pipe(float startX)
 void Pipe::Update(float deltaTime)
 {
     // Le tuyau avance vers la gauche
-    mX -= speed * deltaTime;
+    mX -= SPEED * deltaTime;
 }
 
 //=======================================================================================
@@ -73,18 +73,18 @@ void Pipe::Draw(SDL_Renderer *renderer, SDL_Texture *texture)
 bool Pipe::IsOffScreen()
 {
     // Si le tuyau est complètement à gauche de l'écran (x < -largeur)
-    return (mX + width < 0);
+    return (mX + WIDTH< 0);
 }
 
 // FONCTIONS DE COLLISION (Hitboxes)
 SDL_FRect Pipe::GetTopRect()
 {
     // Le tuyau du haut va de 0 jusqu'au début du trou
-    return {mX, 0, width, mGapY - (GAP_SIZE / 2)};
+    return {mX, 0, WIDTH, mGapY - (GAP_SIZE / 2)};
 }
 SDL_FRect Pipe::GetBottomRect()
 {
     // Le tuyau du bas commence après le trou et va jusqu'en bas (600)
-    return {mX, mGapY + (GAP_SIZE / 2), width, 600.0f - (mGapY + (GAP_SIZE / 2))};
+    return {mX, mGapY + (GAP_SIZE / 2), WIDTH, 600.0f - (mGapY + (GAP_SIZE / 2))};
 }
 //=======================================================================================

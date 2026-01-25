@@ -5,6 +5,7 @@
             "includePath": [
                 "C:\\Users\\Game_Changer one\\OneDrive\\Desktop\\MonProjet\\thirdparty\\imgui",
                 "C:\\Users\\Game_Changer one\\OneDrive\\Desktop\\MonProjet\\thirdparty\\SDL3\\include\\SDL3",
+                "C:\\Users\\Game_Changer one\\OneDrive\\Desktop\\GAP_NOTES\\MonProjet\\libs\\imgui",
                 "${workspaceFolder}/include"
             ],
             "defines": [

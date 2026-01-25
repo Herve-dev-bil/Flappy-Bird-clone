@@ -2,6 +2,10 @@
 #include "SDL_image.h"
 #include <iostream>
 
+
+// pour avoir le droit de manipuler des fichiers
+#include <fstream> 
+
 //=======================================================================================
 
 SDL_Texture *Game::LoadTexture(const char *fileName)
@@ -16,7 +20,7 @@ SDL_Texture *Game::LoadTexture(const char *fileName)
 
 //=======================================================================================
 // --- LE CONSTRUCTEUR (Naissance) ---
-Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nullptr), game_paused(false)
+Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nullptr)
 {
 
     // 1. On démarre le système vidéo de SDL
@@ -41,6 +45,13 @@ Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nul
 
     // initialise le chronometre a 0
     mPipeSpawnTimer = 0.0f;
+
+    mScore = 0;
+    
+    LoadHighScore(); // <--- AJOUT : On récupère le passé
+    
+   // mUI.Init(mWindow, mRenderer);
+    
 }
 
 //=======================================================================================
@@ -82,7 +93,13 @@ void Game::Update(float deltaTime)
     if (birdHitbox.y + birdHitbox.h >= 500.0f)
     {
         SDL_Log("MORT : Touché le sol !");
-       game_paused = false;
+       mIsRunning = false;
+       if (mScore > mHighScore)
+    {
+        mHighScore = mScore; // On met à jour la mémoire
+        SaveHighScore();     // On écrit sur le disque dur immédiatement
+        SDL_Log("Nouveau Record Sauvegardé !");
+    }
     }
 
     // 3) Défilement du Sol
@@ -138,7 +155,14 @@ void Game::Update(float deltaTime)
             SDL_HasRectIntersectionFloat(&birdHitbox, &rBottom))
         {
             SDL_Log("MORT : Collision Tuyau !");
-           game_paused = false;
+       mIsRunning = false;
+
+       if (mScore > mHighScore)
+    {
+        mHighScore = mScore; // On met à jour la mémoire
+        SaveHighScore();     // On écrit sur le disque dur immédiatement
+        SDL_Log("Nouveau Record Sauvegardé !");
+    }
         }
     }
 }
@@ -160,9 +184,7 @@ void Game::Run()
         lastTime = currentTime;
 
         ProcessInput();
-        if (!game_paused){
         Update(deltaTime);
-        }
         GenerateOutput();
         
     }
@@ -227,4 +249,34 @@ void Game::GenerateOutput()
 
     // 4. On affiche le tout
     SDL_RenderPresent(mRenderer);
+}
+
+void Game::LoadHighScore()
+{
+    // On essaie d'ouvrir le fichier "highscore.txt" en lecture (input)
+    std::ifstream file("highscore.txt");
+
+    if (file.is_open())
+    {
+        file >> mHighScore; // On lit le nombre dans le fichier
+        file.close();
+    }
+    else
+    {
+        // Si le fichier n'existe pas (première fois qu'on joue), le record est 0
+        mHighScore = 0;
+    }
+}
+
+void Game::SaveHighScore()
+{
+    // On ouvre le fichier en écriture (output)
+    // Cela écrase l'ancien contenu pour mettre le nouveau
+    std::ofstream file("highscore.txt");
+
+    if (file.is_open())
+    {
+        file << mHighScore; // On écrit le record dedans
+        file.close();
+    }
 }

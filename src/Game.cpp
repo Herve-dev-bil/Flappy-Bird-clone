@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "SDL_image.h"
+#include <iostream>
 
 //=======================================================================================
 
@@ -15,7 +16,7 @@ SDL_Texture *Game::LoadTexture(const char *fileName)
 
 //=======================================================================================
 // --- LE CONSTRUCTEUR (Naissance) ---
-Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nullptr)
+Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nullptr), game_paused(false)
 {
 
     // 1. On démarre le système vidéo de SDL
@@ -72,27 +73,29 @@ Game::~Game()
 
 void Game::Update(float deltaTime)
 {
-    // l'oiseau Calcule sa nouvelle position selon le temps écoulé"
+    //1) l'oiseau Calcule sa nouvelle position selon le temps écoulé"
     mBird->Update(deltaTime);
 
-    // 2. Collision Oiseau vs Sol
+    // 2) Collision Oiseau vs Sol
     SDL_FRect birdHitbox = mBird->GetHitbox();
     //regarde si le bas du hitbox touche le sol
     if (birdHitbox.y + birdHitbox.h >= 500.0f)
     {
         SDL_Log("MORT : Touché le sol !");
-        mIsRunning = false;
+       game_paused = false;
     }
 
-    // 3. Défilement du Sol
+    // 3) Défilement du Sol
     mGroundX -= 200.0f * deltaTime;
     if (mGroundX <= -800.0f)
         mGroundX = 0.0f;
 
+        //4)[gestion des Tuyaux]
+
     mPipeSpawnTimer += deltaTime;
     if (mPipeSpawnTimer >= 1.5f)
-    { // Tous les 1.5 secondes
-        // On crée un nouveau tuyau à droite de l'écran (800px)
+    { /* Tous les 1.5 secondes
+         On crée un nouveau tuyau à droite de l'écran (800px)*/
         mPipes.push_back(new Pipe(800.0f));
         mPipeSpawnTimer = 0.0f; // On remet le chrono à 0
     }
@@ -112,6 +115,19 @@ void Game::Update(float deltaTime)
             continue;
         }
 
+        //5) Score
+        // Si le tuyau dépasse l'oiseau (X < 100) et n'est pas encore compté
+        if (mPipes[i]->GetX() + 60.0f < 100.0f && !mPipes[i]->IsPassed())
+        {
+            mScore++;//augmente score par 1
+            mPipes[i]->SetPassed();//definir le tuyau comme deja ete passee
+
+            // Mise à jour du titre
+            char titleBuffer[64];
+            sprintf(titleBuffer, "Flappy Bird - Score: %d", mScore);
+            SDL_SetWindowTitle(mWindow, titleBuffer);
+        }
+
         SDL_FRect rTop = mPipes[i]->GetTopRect();
         SDL_FRect rBottom = mPipes[i]->GetBottomRect();
 
@@ -122,7 +138,7 @@ void Game::Update(float deltaTime)
             SDL_HasRectIntersectionFloat(&birdHitbox, &rBottom))
         {
             SDL_Log("MORT : Collision Tuyau !");
-            mIsRunning = false;
+           game_paused = false;
         }
     }
 }
@@ -144,8 +160,11 @@ void Game::Run()
         lastTime = currentTime;
 
         ProcessInput();
+        if (!game_paused){
         Update(deltaTime);
+        }
         GenerateOutput();
+        
     }
 }
 

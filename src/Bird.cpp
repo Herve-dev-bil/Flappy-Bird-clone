@@ -66,10 +66,10 @@ void Bird::Draw(SDL_Renderer *renderer)
         SDL_FRect debugBox= GetHitbox();
 
         //Dessiner la hitbox en rouge, aide a visualiser le hitbox
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+       SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderRect(renderer, &debugBox);
 
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         SDL_RenderRect(renderer, &mRect);
     }
     else

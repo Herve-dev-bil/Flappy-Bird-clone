@@ -13,6 +13,8 @@ public:
   ~Game();
   void Run();
 
+  int mScore; // LE SCORE
+
 private:
   void ProcessInput();
   void Update(float deltaTime);
@@ -21,8 +23,10 @@ private:
   SDL_Window *mWindow;
   SDL_Renderer *mRenderer;
   bool mIsRunning;
+  bool game_paused;
 
   Bird *mBird;
+ 
 
   SDL_Texture *mTexBackground; // L'image du ciel
   SDL_Texture *mTexGround;     // L'image du sol

@@ -22,9 +22,14 @@ public:
     SDL_FRect GetTopRect();    // tuyau d'en haut
     SDL_FRect GetBottomRect(); // tuyau d'en bas
 
+    // score
+    bool IsPassed() const { return mIsPassed; }
+    void SetPassed() { mIsPassed = true; }
+
 private:
     float mX;    //  horizontale
     float mGapY; // Hauteur
+    bool mIsPassed;
 
     // Constantes (Règles du jeu)
     const float width = 60.0f;     // Largeur du tuyau

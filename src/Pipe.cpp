@@ -42,9 +42,9 @@ void Pipe::Draw(SDL_Renderer *renderer, SDL_Texture *texture)
             SDL_FLIP_VERTICAL // Tête en bas(flip)
 
         );
-         //pour voir les hitbox des tuyau
+        /* //pour voir les hitbox des tuyau
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderRect(renderer, &topRect);
+        SDL_RenderRect(renderer, &topRect);*/
     }
     else
     {
@@ -60,8 +60,8 @@ void Pipe::Draw(SDL_Renderer *renderer, SDL_Texture *texture)
     {
         SDL_RenderTexture(renderer, texture, NULL, &bottomRect);
 
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderRect(renderer, &bottomRect);
+       /* SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderRect(renderer, &bottomRect);*/
     }
     else
     {

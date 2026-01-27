@@ -6,6 +6,7 @@
 
 #include <SDL3/SDL.h>
 #include "Bird.h"
+#include "UI.h"
 class Game
 {
 public:
@@ -13,13 +14,15 @@ public:
   ~Game();
   void Run();
 
-  // Ajoutez un "getter" pour que l'UI puisse afficher le record
+  // Ajout  d'un "getter" pour que l'UI puisse afficher le record
   int GetHighScore() const { return mHighScore; }
 
 private:
   void ProcessInput();
   void Update(float deltaTime);
   void GenerateOutput();
+  void RestartGame();
+
 
   void LoadHighScore(); // Lire le fichier au démarrage
   void SaveHighScore(); // Écrire dans le fichier quand on gagne
@@ -27,12 +30,16 @@ private:
   SDL_Window *mWindow;
   SDL_Renderer *mRenderer;
   bool mIsRunning;
-  bool game_paused;
+  
+  GameState mState;
 
   Bird *mBird;
 
   int mScore;     // LE SCORE
   int mHighScore; // Le Record (sauvegardé)
+
+  //L'instance de l'interface
+  UI mUI;
 
   SDL_Texture *mTexBackground; // L'image du ciel
   SDL_Texture *mTexGround;     // L'image du sol

@@ -12,8 +12,8 @@ Bird::Bird()
     mRect.x = 100.0f;
     mRect.y = 300.0f;
 
-    mRect.w = 68.0f; // Largeur de l'image
-    mRect.h = 48.0f; // Hauteur de l'image
+    mRect.w = 50.0f; // Largeur de l'image
+    mRect.h = 35.0f; // Hauteur de l'image
 
     mVelocity = 0.0f; // depart->vitesse=0
 }
@@ -66,11 +66,11 @@ void Bird::Draw(SDL_Renderer *renderer)
         SDL_FRect debugBox= GetHitbox();
 
         //Dessiner la hitbox en rouge, aide a visualiser le hitbox
-       SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+     /*  SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderRect(renderer, &debugBox);
 
          SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_RenderRect(renderer, &mRect);
+        SDL_RenderRect(renderer, &mRect);*/
     }
     else
     {

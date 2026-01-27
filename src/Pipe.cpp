@@ -10,6 +10,8 @@ Pipe::Pipe(float startX)
     // On choisit une hauteur de trou aléatoire
     // Le trou sera entre 150px et 450px de hauteur
     mGapY = 150.0f + (rand() % 300);
+
+    mIsPassed = false; // Par défaut, le tuyau n'est pas encore passé
 }
 
 //=======================================================================================

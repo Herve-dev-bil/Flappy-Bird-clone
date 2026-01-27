@@ -2,9 +2,8 @@
 #include "SDL_image.h"
 #include <iostream>
 
-
 // pour avoir le droit de manipuler des fichiers
-#include <fstream> 
+#include <fstream>
 
 //=======================================================================================
 
@@ -30,7 +29,7 @@ Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nul
 
     mRenderer = SDL_CreateRenderer(mWindow, NULL);
 
-    mBird = new Bird();
+    mBird = new Bird();//Alloue la mémoire pour l'oiseau (dans le Heap) 
 
     if (!mBird->Initialize(mRenderer))
     {
@@ -40,26 +39,25 @@ Game::Game() : mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mBird(nul
     // 4. On charge le décor (Ciel et Sol)
     mTexBackground = LoadTexture("assets/images/world1-removebg-preview (1).png");
     mTexGround = LoadTexture("assets/images/flappy_ground.png");
-    mTexPipe = LoadTexture("assets/images/green_pipe-removebg-preview (1).png");
+    mTexPipe = LoadTexture("assets/images/pipe-removebg-preview - Copy.png");
     mGroundX = 0.0f;
 
     // initialise le chronometre a 0
     mPipeSpawnTimer = 0.0f;
 
     mScore = 0;
-    
-    LoadHighScore(); // <--- AJOUT : On récupère le passé
-    
-   // mUI.Init(mWindow, mRenderer);
-    
+
+    mState = STATE_MENU; // On commence sur le menu
+    LoadHighScore();
+    mUI.Init(mWindow, mRenderer);
 }
 
 //=======================================================================================
 
 Game::~Game()
 {
-
-    delete mBird;
+    mUI.Shutdown();
+    delete mBird;//: Libère la mémoire de l'oiseau
 
     // 2. Nettoyage des tuyaux restants
     for (auto pipe : mPipes)
@@ -69,6 +67,7 @@ Game::~Game()
     mPipes.clear();
 
     // 3. Nettoyage des textures
+    //Vide la mémoire de la carte graphique
     if (mTexBackground)
         SDL_DestroyTexture(mTexBackground);
     if (mTexGround)
@@ -82,24 +81,53 @@ Game::~Game()
     SDL_Quit(); // On éteint SDL
 }
 
+//=======================================================================================
+void Game::Run()
+{
+
+    Uint64 lastTime = SDL_GetTicks();
+
+    while (mIsRunning)
+    {
+
+        Uint64 currentTime = SDL_GetTicks();
+        // difference du temps
+        float deltaTime = (currentTime - lastTime) / 1000.0f;
+
+        // mise a jour de l'heure
+        lastTime = currentTime;
+
+        ProcessInput();
+        Update(deltaTime);
+        GenerateOutput();
+    }
+}
+
+//=======================================================================================
+
 void Game::Update(float deltaTime)
 {
-    //1) l'oiseau Calcule sa nouvelle position selon le temps écoulé"
+
+    if (mState != STATE_PLAYING)
+    {
+        return;
+    }
+    // 1) l'oiseau Calcule sa nouvelle position selon le temps écoulé"
     mBird->Update(deltaTime);
 
     // 2) Collision Oiseau vs Sol
     SDL_FRect birdHitbox = mBird->GetHitbox();
-    //regarde si le bas du hitbox touche le sol
+    // regarde si le bas du hitbox touche le sol
     if (birdHitbox.y + birdHitbox.h >= 500.0f)
     {
         SDL_Log("MORT : Touché le sol !");
-       mIsRunning = false;
-       if (mScore > mHighScore)
-    {
-        mHighScore = mScore; // On met à jour la mémoire
-        SaveHighScore();     // On écrit sur le disque dur immédiatement
-        SDL_Log("Nouveau Record Sauvegardé !");
-    }
+        mState = STATE_GAME_OVER;
+        if (mScore > mHighScore)
+        {
+            mHighScore = mScore; // On met à jour la mémoire
+            SaveHighScore();     // On écrit sur le disque dur immédiatement
+            SDL_Log("Nouveau Record Sauvegardé !");
+        }
     }
 
     // 3) Défilement du Sol
@@ -107,7 +135,7 @@ void Game::Update(float deltaTime)
     if (mGroundX <= -800.0f)
         mGroundX = 0.0f;
 
-        //4)[gestion des Tuyaux]
+    // 4)[gestion des Tuyaux]
 
     mPipeSpawnTimer += deltaTime;
     if (mPipeSpawnTimer >= 1.5f)
@@ -132,12 +160,12 @@ void Game::Update(float deltaTime)
             continue;
         }
 
-        //5) Score
-        // Si le tuyau dépasse l'oiseau (X < 100) et n'est pas encore compté
+        // 5) Score
+        //  Si le tuyau dépasse l'oiseau (X < 100) et n'est pas encore compté
         if (mPipes[i]->GetX() + 60.0f < 100.0f && !mPipes[i]->IsPassed())
         {
-            mScore++;//augmente score par 1
-            mPipes[i]->SetPassed();//definir le tuyau comme deja ete passee
+            mScore++;               // augmente score par 1
+            mPipes[i]->SetPassed(); // definir le tuyau comme deja ete passee
 
             // Mise à jour du titre
             char titleBuffer[64];
@@ -155,65 +183,62 @@ void Game::Update(float deltaTime)
             SDL_HasRectIntersectionFloat(&birdHitbox, &rBottom))
         {
             SDL_Log("MORT : Collision Tuyau !");
-       mIsRunning = false;
+            mState = STATE_GAME_OVER;
 
-       if (mScore > mHighScore)
-    {
-        mHighScore = mScore; // On met à jour la mémoire
-        SaveHighScore();     // On écrit sur le disque dur immédiatement
-        SDL_Log("Nouveau Record Sauvegardé !");
-    }
+            if (mScore > mHighScore)
+            {
+                mHighScore = mScore; // On met à jour la mémoire
+                SaveHighScore();     // On écrit sur le disque dur immédiatement
+                SDL_Log("Nouveau Record Sauvegardé !");
+            }
         }
     }
 }
 
 //=======================================================================================
-void Game::Run()
-{
 
-    Uint64 lastTime = SDL_GetTicks();
-
-    while (mIsRunning)
-    {
-
-        Uint64 currentTime = SDL_GetTicks();
-        // difference du temps
-        float deltaTime = (currentTime - lastTime) / 1000.0f;
-
-        // mise a jour de l'heure
-        lastTime = currentTime;
-
-        ProcessInput();
-        Update(deltaTime);
-        GenerateOutput();
-        
-    }
-}
-
-//=======================================================================================
 void Game::ProcessInput()
 {
     SDL_Event event;
-
     while (SDL_PollEvent(&event))
     {
+        // On délègue à l'UI
+        mUI.ProcessEvent(&event);
 
         if (event.type == SDL_EVENT_QUIT)
         {
             mIsRunning = false;
         }
+
         else if (event.type == SDL_EVENT_KEY_DOWN)
         {
-            if (event.key.key == SDLK_SPACE)
-            {
-                if (!event.key.repeat)
+            // ceci empêche de sauter si on est en train de cliquer sur une fenêtre ImGui
+           
+                if (event.key.key == SDLK_SPACE && !event.key.repeat)
                 {
-                    mBird->Jump();
+                    // MACHINE A ÉTATS DES ENTRÉES
+                    switch (mState)
+                    {
+                    case STATE_MENU:
+                        RestartGame(); // Commence le jeu (même logique que restart)
+                         mBird->Jump(); 
+                        break;
+
+                    case STATE_PLAYING:
+                        mBird->Jump(); // Saute
+                        break;
+
+                    case STATE_GAME_OVER:
+                    // Si MORT -> On recommence
+                        RestartGame(); // Recommence
+                        break;
+                    }
                 }
             }
         }
-    }
-}
+    };
+
+
 
 //=======================================================================================
 
@@ -247,9 +272,27 @@ void Game::GenerateOutput()
     //  dessine l'oiseau
     mBird->Draw(mRenderer);
 
+    // Appel de la fonction Draw de l'UI
+    bool startGame = false;
+    bool restart = false;
+    bool quit = false;
+
+    // On passe mState à l'UI
+    mUI.Draw(mRenderer, mState, mScore, mHighScore, startGame, restart, quit);
+
+    // Actions des boutons
+    if (startGame)
+        RestartGame(); // Le bouton "Jouer" du menu lance le jeu
+    if (restart)
+        RestartGame(); // Le bouton "Recommencer" relance
+    if (quit)
+        mIsRunning = false;
+
     // 4. On affiche le tout
     SDL_RenderPresent(mRenderer);
 }
+
+//=======================================================================================
 
 void Game::LoadHighScore()
 {
@@ -267,6 +310,8 @@ void Game::LoadHighScore()
         mHighScore = 0;
     }
 }
+//=======================================================================================
+
 
 void Game::SaveHighScore()
 {
@@ -280,3 +325,36 @@ void Game::SaveHighScore()
         file.close();
     }
 }
+//=======================================================================================
+
+void Game::RestartGame()
+{
+    // 1. On remet l'oiseau au début
+    delete mBird;                 // On supprime l'ancien (mort)
+    mBird = new Bird();           // On en crée un tout neuf
+    mBird->Initialize(mRenderer); // On recharge son image
+
+    // 2. On supprime tous les tuyaux actuels
+    for (auto pipe : mPipes)
+    {
+        delete pipe;
+    }
+    mPipes.clear(); // La liste redevient vide
+
+    // 3. On reset les timers
+    mPipeSpawnTimer = 0.0f;
+
+    // passe l'état à "PLAYING"
+    mState = STATE_PLAYING;
+
+    // 4. Petit cadeau : un tuyau facile au début
+    mPipes.push_back(new Pipe(400.0f));
+
+    mScore = 0;
+    // Reset du titre de la fenêtre
+    SDL_SetWindowTitle(mWindow, "Flappy Bird - Score: 0");
+
+    mScore = 0;
+    SDL_Log("Jeu redémarré !");
+}
+//=======================================================================================
